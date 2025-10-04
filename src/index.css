@@ -1,0 +1,14 @@
+@import "tailwindcss";
+
+cdn
+*{
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body{
+  background-color: #10101010;
+  color: #fff;
+  font-family: "montserrat", system-ui, sans-serif;
+}
