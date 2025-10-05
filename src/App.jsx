@@ -1,11 +1,9 @@
-import Navbar from './Components/Navbar'
-import MovieList from './Components/MovieList'
+import Home from './Components/Home'
 const App = () => {
   return (
-    <div className='App min-h-screen text-white bg-black'>
-       <Navbar />
-    <MovieList />
-      </div>
+    
+    <Home />
+      
   )
 }
 
