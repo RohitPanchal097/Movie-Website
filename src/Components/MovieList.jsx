@@ -1,16 +1,48 @@
 import React, { useEffect, useState } from "react";
+import _ from "lodash";
 import MovieCard from "./MovieCard";
 const MovieList = () => {
   const [movies, setMovies] = useState([]);
   const [filteredMovies, setFilteredMovies] = useState([]);
   const [selectedGenre, setSelectedGenre] = useState("All");
   const [genres, setGenres] = useState([]);
+  const [sort, setSort] = useState({
+    by: "default",
+    order: "asc"
+  })
   
   useEffect(() => {
     fetchMovies();
     fetchGenres();
-    filterdMovies();
+  }, []);
+
+  useEffect(() => {
+    filterMovies();
   }, [movies, selectedGenre]);
+
+  useEffect(() => {
+    if (sort.by !== "default") {
+      let moviesToSort = [...filteredMovies];
+      
+      // Handle date sorting by converting to Date objects
+      if (sort.by === "release_date") {
+        moviesToSort = moviesToSort.map(movie => ({
+          ...movie,
+          release_date_parsed: new Date(movie.release_date)
+        }));
+        const sortedMovies = _.orderBy(moviesToSort, ['release_date_parsed'], [sort.order]);
+        // Remove the temporary parsed date property
+        const cleanedMovies = sortedMovies.map(({release_date_parsed, ...movie}) => movie);
+        setFilteredMovies(cleanedMovies);
+      } else {
+        const sortedMovies = _.orderBy(moviesToSort, [sort.by], [sort.order]);
+        setFilteredMovies(sortedMovies);
+      }
+    } else {
+      // Reset to original filtered movies when "default" is selected
+      filterMovies();
+    }
+  }, [sort]);
 
   const fetchMovies = async () => {
     const response = await fetch(
@@ -26,7 +58,7 @@ const MovieList = () => {
     setGenres(data.genres)
   }
 
-  const filterdMovies = () => {
+  const filterMovies = () => {
     if(selectedGenre === "All"){
       setFilteredMovies(movies)
     } else {
@@ -38,6 +70,15 @@ const MovieList = () => {
 
 const handleGenreFilter = (genre) =>{
   setSelectedGenre(genre)
+}
+
+const handleSort = (e) =>{
+  const {name, value} = e.target;
+  setSort(prev =>{
+    return {...prev, [name]: value}
+   
+  })
+  
 }
 
   return (
@@ -74,22 +115,22 @@ const handleGenreFilter = (genre) =>{
           </div>
         {/* Sort by */}
         <div className="movie-list-sort-container flex items-center gap-4 ">
-        <select className="movie-list-sort ">
-            <option className="text-black" value="SortBy">
+        <select name='by'className="movie-list-sort " onChange={handleSort} value={sort.by}>
+            <option value="default" className="text-black" >
               SortBy
             </option>
-            <option className="text-black" value="Date">
+            <option value= "release_date" className="text-black" >
               Date
             </option>
-            <option className="text-black" value="Rating">
+            <option value="vote_average" className="text-black" >
               Rating
             </option>
           </select>
-          <select className="movie-list-sort  ">
-            <option className="text-black" value="Ascending">
+          <select name= 'order' className="movie-list-sort  " onChange={handleSort} value={sort.order}>
+            <option value="asc" className="text-black" >
               Ascending
             </option>
-            <option className="text-black" value="Descending">
+            <option value='desc'className="text-black" >
               Descending
             </option>
           </select>
@@ -97,7 +138,7 @@ const handleGenreFilter = (genre) =>{
          
         </div>
       </header>
-      <div className="movie-cards-container grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 place-items-center">
+      <div className="movie-cards-container grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 place-items-center  ">
         {filteredMovies.map((movie) =>(
           <MovieCard key={movie.id} movie={movie} />
         ))}
