@@ -24,14 +24,14 @@ const MovieList = () => {
     if (sort.by !== "default") {
       let moviesToSort = [...filteredMovies];
       
-      // Handle date sorting by converting to Date objects
+     
       if (sort.by === "release_date") {
         moviesToSort = moviesToSort.map(movie => ({
           ...movie,
           release_date_parsed: new Date(movie.release_date)
         }));
         const sortedMovies = _.orderBy(moviesToSort, ['release_date_parsed'], [sort.order]);
-        // Remove the temporary parsed date property
+        
         const cleanedMovies = sortedMovies.map(({release_date_parsed, ...movie}) => movie);
         setFilteredMovies(cleanedMovies);
       } else {
@@ -39,7 +39,7 @@ const MovieList = () => {
         setFilteredMovies(sortedMovies);
       }
     } else {
-      // Reset to original filtered movies when "default" is selected
+
       filterMovies();
     }
   }, [sort]);
