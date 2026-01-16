@@ -7,6 +7,8 @@ const MovieDetails = () => {
   const [error, setError] = useState(null);
   const Navigate = useNavigate();
   const [credits, setCredits] = useState(null);
+  const [similarMovies, setSimilarMovies] = useState([]);
+  const [trailers, setTrailers] = useState([]);
 
   useEffect(() => {
     const fetchMovieDetails = async () => {
@@ -46,6 +48,43 @@ const MovieDetails = () => {
       }
     };
     fetchMovieCredits();
+  }, [id]);
+
+  useEffect(() => {
+    const fetchSimilarMovies = async () => {
+      try {
+        const response = await fetch(
+          `https://api.themoviedb.org/3/movie/${id}/similar?api_key=41940d354916763b51d7fc769681ea65`
+        );
+        if (!response.ok) {
+          throw new Error("Failed to fetch similar movies");
+        }
+        const data = await response.json();
+        setSimilarMovies(data.results.slice(0, 5));
+      } catch (err) {
+        setError(err.message);
+      }
+    };
+    fetchSimilarMovies();
+  }, [id]);
+
+  useEffect(() => {
+    const fetchTrailers = async () => {
+      try{
+        const response = await fetch(
+          `https://api.themoviedb.org/3/movie/${id}/videos?api_key=41940d354916763b51d7fc769681ea65`
+        );
+        if (!response.ok) {
+          throw new Error("Failed to fetch trailers");
+        }
+        const data = await response.json();
+        setTrailers(data.results.filter(video => video.type === "Trailer"));
+      }
+      catch (err) {
+        setError(err.message);
+    }
+    };
+    fetchTrailers()
   }, [id]);
 
   if (loading) {
@@ -111,19 +150,47 @@ const MovieDetails = () => {
             </p>
 
             {credits && (
-                <div>
+              <div>
                 <h3 className="text-2xl font-bold mt-6 mb-4">Cast</h3>
-                <ul>
-                    {credits.cast.slice(0, 5).map((actor) => (
-                        <li key={actor.id}>{actor.name} as {actor.character}</li>
-                    ))}
+                <ul className="list-disc list-inside flex gap-2 items-center justify-center">
+                  {credits.cast.slice(0, 5).map((actor) => (
+                    <li key={actor.id}>
+                      {actor.name} as {actor.character}
+                    </li>
+                  ))}
                 </ul>
-                <h2>Director</h2>
-                <p>{credits.crew.find(person => person.job === "Director")?.name || "N/A"}</p>
-                </div>
+                
+              </div>
+            )}
+            {trailers.length > 0 && (
+              <div>
+                <h3 className="text-2xl font-bold mt-6 mb-4">Trailers</h3>
+                <iframe
+                  width="560"
+                  height="315"
+                  src={`https://www.youtube.com/embed/${trailers[0]?.key}`}
+                  title="YouTube video player"
+                  frameBorder="0"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                ></iframe>
+              </div>
             )}
           </div>
         </div>
+        {similarMovies.length > 0 && (
+          <div>
+            <h3 className="text-2xl font-bold mt-6 mb-4">Similar Movies</h3>
+            <div className="flex flex-wrap gap-4 cursor-pointer">
+              {similarMovies.map((similarMovie) => (
+                <div key={similarMovie.id} onClick={() => Navigate(`/movie/${similarMovie.id}`)} className="mb-4 w-48">
+                  <img src={`https://image.tmdb.org/t/p/w500/${similarMovie.poster_path}`} alt={similarMovie.title} />
+                  <h4>{similarMovie.title}</h4>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
     </>
   );
