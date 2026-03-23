@@ -7,10 +7,10 @@ const MovieCard = ({ movie }) => {
   }
 
   return (
-        <div onClick={handleClick} className="movie-card hover:scale-105 transition-all duration-300 cursor-pointer shadow-lg rounded-xl overflow-hidden w-65 h-96 relative">
+        <button onClick={handleClick} className="movie-card hover:scale-105 transition-all duration-300 cursor-pointer shadow-lg rounded-xl overflow-hidden w-65 h-96 relative" aria-label={`View details for ${movie.title}`}>
           <img
             src={`https://image.tmdb.org/t/p/w500/${movie.poster_path}`}
-            alt=""
+            alt={`Poster for ${movie.title}`}
           />
           <div className="movie-card-content absolute bottom-0 left-0 right-0 p-4 bg-black/80 ">
           
@@ -23,7 +23,7 @@ const MovieCard = ({ movie }) => {
               {movie.overview.slice(0, 100) + "..."}
             </p>
           </div>
-        </div>
+        </button>
       
     
   );

@@ -88,34 +88,45 @@ const handleSort = (e) =>{
           <h2>Popular Movies</h2>
         </div>
         <div className="movie-list-filter-container flex items-center gap-4 md:flex-row sm:flex-col flex-col">
-          <div className="movie-list-filter ">
-            <ul className="flex gap-2">
-              <li
+        <div className="movie-list-filter ">
+            <ul className="flex gap-2" role="list">
+              <li role="listitem">
+              <button
               onClick={() => handleGenreFilter("All")}  
               className={`cursor-pointer ${selectedGenre === "All" ? "text-red-500" : "text-white"}`}  
-              >All </li>
-              <li
+              aria-pressed={selectedGenre === "All"}
+              >All </button></li>
+              <li role="listitem">
+              <button
               onClick={() => handleGenreFilter("Action")}
               className={`cursor-pointer ${selectedGenre === "Action" ? "text-red-500" : "text-white"}`}
-              >Action</li>
-              <li
+              aria-pressed={selectedGenre === "Action"}
+              >Action</button></li>
+              <li role="listitem">
+              <button
               onClick={() => handleGenreFilter("Adventure")}
               className={`cursor-pointer ${selectedGenre === "Adventure" ? "text-red-500" : "text-white"}`}
-              >Adventure</li>
-              <li
+              aria-pressed={selectedGenre === "Adventure"}
+              >Adventure</button></li>
+              <li role="listitem">
+              <button
               onClick={() => handleGenreFilter("Comedy")}
               className={`cursor-pointer ${selectedGenre === "Comedy" ? "text-red-500" : "text-white"}`}
-              >Comedy</li>
-              <li
+              aria-pressed={selectedGenre === "Comedy"}
+              >Comedy</button></li>
+              <li role="listitem">
+              <button
               onClick={() => handleGenreFilter("Drama")}
               className={`cursor-pointer ${selectedGenre === "Drama" ? "text-red-500" : "text-white"}`}
-              >Drama</li>
+              aria-pressed={selectedGenre === "Drama"}
+              >Drama</button></li>
              
             </ul>
           </div>
         {/* Sort by */}
         <div className="movie-list-sort-container flex items-center gap-4 ">
-        <select name='by'className="movie-list-sort " onChange={handleSort} value={sort.by}>
+        <label htmlFor="sort-by" className="sr-only">Sort by</label>
+        <select id="sort-by" name='by'className="movie-list-sort " onChange={handleSort} value={sort.by}>
             <option value="default" className="text-black" >
               SortBy
             </option>
@@ -126,7 +137,8 @@ const handleSort = (e) =>{
               Rating
             </option>
           </select>
-          <select name= 'order' className="movie-list-sort  " onChange={handleSort} value={sort.order}>
+          <label htmlFor="sort-order" className="sr-only">Sort order</label>
+          <select id="sort-order" name= 'order' className="movie-list-sort  " onChange={handleSort} value={sort.order}>
             <option value="asc" className="text-black" >
               Ascending
             </option>

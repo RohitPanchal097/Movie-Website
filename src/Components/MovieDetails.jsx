@@ -9,6 +9,25 @@ const MovieDetails = () => {
   const [credits, setCredits] = useState(null);
   const [similarMovies, setSimilarMovies] = useState([]);
   const [trailers, setTrailers] = useState([]);
+  const [activeTab, setActiveTab] = useState('overview');
+
+  const tabs = [
+    { id: 'overview', label: 'Overview' },
+    { id: 'cast', label: 'Cast' },
+    { id: 'trailers', label: 'Trailers' }
+  ];
+
+  const handleTabKeyDown = (event) => {
+    const currentIndex = tabs.findIndex((tab) => tab.id === activeTab);
+    if (event.key === 'ArrowRight') {
+      const nextIndex = (currentIndex + 1) % tabs.length;
+      setActiveTab(tabs[nextIndex].id);
+    }
+    if (event.key === 'ArrowLeft') {
+      const prevIndex = (currentIndex - 1 + tabs.length) % tabs.length;
+      setActiveTab(tabs[prevIndex].id);
+    }
+  };
 
   useEffect(() => {
     const fetchMovieDetails = async () => {
@@ -88,10 +107,10 @@ const MovieDetails = () => {
   }, [id]);
 
   if (loading) {
-    return <div>Loading...</div>;
+    return <div aria-live="polite">Loading movie details...</div>;
   }
   if (error) {
-    return <div>Error: {error}</div>;
+    return <div role="alert" aria-live="assertive">Error: {error}</div>;
   }
 
   if (!movie) {
@@ -106,6 +125,7 @@ const MovieDetails = () => {
         <button
           onClick={() => Navigate(-1)}
           className="mb-4 p-2 px-4  bg-gray-500 hover:bg-gray-800 text-white rounded cursor-pointer"
+          aria-label="Go back to previous page"
         >
           Back{" "}
         </button>
@@ -149,47 +169,73 @@ const MovieDetails = () => {
                 .join(", ")}
             </p>
 
-            {credits && (
-              <div>
-                <h3 className="text-2xl font-bold mt-6 mb-4">Cast</h3>
-                <ul className="list-disc list-inside flex gap-2 items-center justify-center">
-                  {credits.cast.slice(0, 5).map((actor) => (
-                    <li key={actor.id}>
-                      {actor.name} as {actor.character}
-                    </li>
+            <div role="tablist" aria-label="Movie detail sections" className="flex gap-2 mt-6 mb-4">
+              {tabs.map((tab) => (
+                <button
+                  key={tab.id}
+                  role="tab"
+                  id={`${tab.id}-tab`}
+                  aria-controls={`${tab.id}-panel`}
+                  aria-selected={activeTab === tab.id}
+                  className={`px-3 py-2 rounded ${activeTab === tab.id ? 'bg-gray-700 text-white' : 'bg-gray-800 text-gray-300'}`}
+                  onClick={() => setActiveTab(tab.id)}
+                  onKeyDown={handleTabKeyDown}
+                >
+                  {tab.label}
+                </button>
+              ))}
+            </div>
+
+            {activeTab === 'overview' && (
+              <section id="overview-panel" role="tabpanel" aria-labelledby="overview-tab" className="mb-4">
+                <h3 className="text-2xl font-bold mb-2">Overview</h3>
+                <p>{movie.overview}</p>
+              </section>
+            )}
+
+            {activeTab === 'cast' && (
+              <section id="cast-panel" role="tabpanel" aria-labelledby="cast-tab" className="mb-4">
+                <h3 className="text-2xl font-bold mb-2">Cast</h3>
+                <ul className="list-disc list-inside space-y-1">
+                  {credits?.cast.slice(0, 8).map((actor) => (
+                    <li key={actor.id}>{actor.name} as {actor.character}</li>
                   ))}
                 </ul>
-                
-              </div>
+              </section>
             )}
-            {trailers.length > 0 && (
-              <div>
-                <h3 className="text-2xl font-bold mt-6 mb-4">Trailers</h3>
-                <iframe
-                  width="560"
-                  height="315"
-                  src={`https://www.youtube.com/embed/${trailers[0]?.key}`}
-                  title="YouTube video player"
-                  frameBorder="0"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                  allowFullScreen
-                ></iframe>
-              </div>
+
+            {activeTab === 'trailers' && (
+              <section id="trailers-panel" role="tabpanel" aria-labelledby="trailers-tab" className="mb-4">
+                <h3 className="text-2xl font-bold mb-2">Trailers</h3>
+                {trailers.length > 0 ? (
+                  <iframe
+                    width="560"
+                    height="315"
+                    src={`https://www.youtube.com/embed/${trailers[0]?.key}`}
+                    title="YouTube video player"
+                    frameBorder="0"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                  ></iframe>
+                ) : (
+                  <p>No trailers available</p>
+                )}
+              </section>
             )}
           </div>
         </div>
         {similarMovies.length > 0 && (
-          <div>
-            <h3 className="text-2xl font-bold mt-6 mb-4">Similar Movies</h3>
-            <div className="flex flex-wrap gap-4 cursor-pointer">
+          <section aria-labelledby="similar-movies-heading">
+            <h3 id="similar-movies-heading" className="text-2xl font-bold mt-6 mb-4">Similar Movies</h3>
+            <div className="flex flex-wrap gap-4">
               {similarMovies.map((similarMovie) => (
-                <div key={similarMovie.id} onClick={() => Navigate(`/movie/${similarMovie.id}`)} className="mb-4 w-48">
-                  <img src={`https://image.tmdb.org/t/p/w500/${similarMovie.poster_path}`} alt={similarMovie.title} />
+                <button key={similarMovie.id} onClick={() => Navigate(`/movie/${similarMovie.id}`)} className="mb-4 w-48" aria-label={`View details for ${similarMovie.title}`}>
+                  <img src={`https://image.tmdb.org/t/p/w500/${similarMovie.poster_path}`} alt={`Poster for ${similarMovie.title}`} />
                   <h4>{similarMovie.title}</h4>
-                </div>
+                </button>
               ))}
             </div>
-          </div>
+          </section>
         )}
       </div>
     </>
