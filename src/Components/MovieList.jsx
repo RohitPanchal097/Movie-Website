@@ -82,80 +82,74 @@ const handleSort = (e) =>{
 }
 
   return (
-    <section className="movie-list max-w-7xl mx-auto mt-4 mb-">
-      <header className="movie-list-header flex  items-center justify-between mb-5 md:flex-row sm:flex-col flex-col">
-        <div className="movie-list-title">
-          <h2>Popular Movies</h2>
-        </div>
-        <div className="movie-list-filter-container flex items-center gap-4 md:flex-row sm:flex-col flex-col">
-        <div className="movie-list-filter ">
-            <ul className="flex gap-2" role="list">
-              <li role="listitem">
-              <button
-              onClick={() => handleGenreFilter("All")}  
-              className={`cursor-pointer ${selectedGenre === "All" ? "text-red-500" : "text-white"}`}  
-              aria-pressed={selectedGenre === "All"}
-              >All </button></li>
-              <li role="listitem">
-              <button
-              onClick={() => handleGenreFilter("Action")}
-              className={`cursor-pointer ${selectedGenre === "Action" ? "text-red-500" : "text-white"}`}
-              aria-pressed={selectedGenre === "Action"}
-              >Action</button></li>
-              <li role="listitem">
-              <button
-              onClick={() => handleGenreFilter("Adventure")}
-              className={`cursor-pointer ${selectedGenre === "Adventure" ? "text-red-500" : "text-white"}`}
-              aria-pressed={selectedGenre === "Adventure"}
-              >Adventure</button></li>
-              <li role="listitem">
-              <button
-              onClick={() => handleGenreFilter("Comedy")}
-              className={`cursor-pointer ${selectedGenre === "Comedy" ? "text-red-500" : "text-white"}`}
-              aria-pressed={selectedGenre === "Comedy"}
-              >Comedy</button></li>
-              <li role="listitem">
-              <button
-              onClick={() => handleGenreFilter("Drama")}
-              className={`cursor-pointer ${selectedGenre === "Drama" ? "text-red-500" : "text-white"}`}
-              aria-pressed={selectedGenre === "Drama"}
-              >Drama</button></li>
-             
+    <section className="movie-list">
+      {/* Header */}
+      <header className="mb-8">
+        <h1 className="text-4xl font-bold mb-6">Popular Movies</h1>
+        
+        {/* Filters and Sort */}
+        <div className="flex flex-col md:flex-row gap-6 items-start md:items-center">
+          {/* Genre Filter */}
+          <div className="movie-list-filter">
+            <label htmlFor="genre-filter" className="text-sm text-gray-400 block mb-2">Genres</label>
+            <ul className="flex gap-2 flex-wrap" role="list">
+              {["All", "Action", "Adventure", "Comedy", "Drama"].map((genre) => (
+                <li key={genre} role="listitem">
+                  <button
+                    onClick={() => handleGenreFilter(genre)}
+                    className={`px-4 py-2 rounded transition ${
+                      selectedGenre === genre
+                        ? "bg-red-600 text-white"
+                        : "bg-gray-800 text-gray-300 hover:bg-gray-700"
+                    }`}
+                    aria-pressed={selectedGenre === genre}
+                  >
+                    {genre}
+                  </button>
+                </li>
+              ))}
             </ul>
           </div>
-        {/* Sort by */}
-        <div className="movie-list-sort-container flex items-center gap-4 ">
-        <label htmlFor="sort-by" className="sr-only">Sort by</label>
-        <select id="sort-by" name='by'className="movie-list-sort " onChange={handleSort} value={sort.by}>
-            <option value="default" className="text-black" >
-              SortBy
-            </option>
-            <option value= "release_date" className="text-black" >
-              Date
-            </option>
-            <option value="vote_average" className="text-black" >
-              Rating
-            </option>
-          </select>
-          <label htmlFor="sort-order" className="sr-only">Sort order</label>
-          <select id="sort-order" name= 'order' className="movie-list-sort  " onChange={handleSort} value={sort.order}>
-            <option value="asc" className="text-black" >
-              Ascending
-            </option>
-            <option value='desc'className="text-black" >
-              Descending
-            </option>
-          </select>
-        </div>
-         
+
+          {/* Sort Section */}
+          <div className="movie-list-sort-container flex gap-4 flex-wrap">
+            <div>
+              <label htmlFor="sort-by" className="text-sm text-gray-400 block mb-2">Sort By</label>
+              <select
+                id="sort-by"
+                name="by"
+                onChange={handleSort}
+                value={sort.by}
+                className="bg-gray-800 text-white px-3 py-2 rounded border border-gray-700 hover:border-gray-500 transition"
+              >
+                <option value="default">Default</option>
+                <option value="release_date">Release Date</option>
+                <option value="vote_average">Rating</option>
+              </select>
+            </div>
+
+            <div>
+              <label htmlFor="sort-order" className="text-sm text-gray-400 block mb-2">Order</label>
+              <select
+                id="sort-order"
+                name="order"
+                onChange={handleSort}
+                value={sort.order}
+                className="bg-gray-800 text-white px-3 py-2 rounded border border-gray-700 hover:border-gray-500 transition"
+              >
+                <option value="asc">Ascending</option>
+                <option value="desc">Descending</option>
+              </select>
+            </div>
+          </div>
         </div>
       </header>
-      <div className="movie-cards-container grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 place-items-center  ">
-        {filteredMovies.map((movie) =>(
+
+      {/* Movie Grid */}
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+        {filteredMovies.map((movie) => (
           <MovieCard key={movie.id} movie={movie} />
         ))}
-
-        {/* <MovieCard /> */} 
       </div>
     </section>
   );
